@@ -1,8 +1,12 @@
 const express = require ('express')
 const app = express()
+const morgan = require('morgan')
 const PORT = 3001
 
 app.use(express.json())
+app.use(morgan('tiny'))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time'))
 
 let persons = [
     { 
@@ -63,6 +67,16 @@ const generateId = () => {
 
 app.post('/api/persons', (req,res)=>{
   const body = req.body 
+
+  if(!body.name){
+    return res.status(418).json({error: 'name in missing'})
+  }
+  if (!body.number){
+    return res.status(418).json({error: 'number in missing'})
+  }
+  if(persons.some(entry => entry.name === body.name)){
+    return res.status(409).json({error: 'the name already exits in the records'})
+  }
 
   let entry = {
     id: generateId(),
