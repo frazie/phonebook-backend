@@ -2,6 +2,8 @@ const express = require ('express')
 const app = express()
 const PORT = 3001
 
+app.use(express.json())
+
 let persons = [
     { 
       "id": 1,
@@ -52,10 +54,26 @@ app.delete('/api/persons/:id',(req,res)=>{
   res.status(204).end()
 })
 
+const generateId = () => {
+  const maxId = persons.length > 0
+    ? Math.max(...persons.map(n => n.id))
+    : 0
+  return maxId + 1
+}
+
 app.post('/api/persons', (req,res)=>{
-    const id = Math.random()*100000
+  const body = req.body 
+
+  let entry = {
+    id: generateId(),
+    name: body.name,
+    number: body.number
+  }
+  
+  persons.push(entry)
+  res.json(entry)
 })
 
 app.listen(PORT, ()=>{
-    console.log(`server active on port${PORT}`)
+    console.log(`server active on port ${PORT}`)
 })
